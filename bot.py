@@ -1,6 +1,7 @@
 import aiohttp
 import asyncio
 import json
+from discord.ext import commands
 from discord.ext.commands import Bot
 
 BOT_PREFIX = ("?", "!")
@@ -16,7 +17,7 @@ async def Test():
                 description="Looks up the given user and returns their stats.",
                 brief="Get your Summoner stats!",
                 aliases=['SummonerLookup'])
-async def SummonerLookup(username):
+async def summonerLookup(username):
     url = "https://na1.api.riotgames.com/lol/summoner/v3/summoners/by-name/" + username
     header = {
         "Origin": "https://developer.riotgames.com",
@@ -32,7 +33,19 @@ async def SummonerLookup(username):
             if (resp.status == 200):
                 response = await resp.text()
                 response = json.loads(response)
-                await client.say("Summoner" + username + " is level " + response['summonerLevel'] + ".")
+                await client.say("Summoner " + username + " is level " + str(response['summonerLevel']) + ".")
+            else:
+            	await client.say("Error: API call could not be made. "
+            		             "Either the given Summoner does not exist, or Riot Games's servers are offline.")
+
+@summonerLookup.error
+async def summonerLookupHandler(error, ctx):
+	if isinstance(error, commands.MissingRequiredArgument):
+		await client.say("Did you forget the summoner's name?")
+		return
+
+	print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+	traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 @client.event
 async def on_ready():
