@@ -8,7 +8,6 @@ from discord.ext import commands
 from discord.ext.commands import Bot
 
 BOT_PREFIX = ("?", "!")
-TOKEN = config.discord_token
 
 client = Bot(command_prefix=BOT_PREFIX)
 
@@ -49,7 +48,6 @@ async def summonerLookup(username):
                 return
 
         rankedUrl += str(summonerId)
-        print(rankedUrl)
         async with session.get(rankedUrl, headers=header) as resp:
             if (resp.status == 200):
                 response = await resp.text()
@@ -75,4 +73,4 @@ async def summonerLookupHandler(error, ctx):
 async def on_ready():
     print("Logged in as " + client.user.name)
 
-client.run(TOKEN)
+client.run(config.discord_token)
